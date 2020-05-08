@@ -187,12 +187,20 @@ int main(int argc, char *argv[])
             {
             case 0:
                 child_pid = getpid();
-                if (dup2(fd2, STDOUT_FILENO) == -1)
+                int fd3 = open("../src/output.txt",
+                   O_WRONLY | O_APPEND,
+                   S_IRUSR | S_IWUSR);
+                if (fd3 == -1)
+                {
+                    perror("open()");
+                    exit(EXIT_FAILURE);
+                }
+                if (dup2(fd3, STDOUT_FILENO) == -1)
                 {
                     perror("problema con dup2");
                     exit(EXIT_FAILURE);
                 }
-                close(fd2);
+                close(fd3);
                 char *new_arguments[] = {"hello", NULL};
                 char *new_environment_variables[] = {NULL};
                 if (execve("../hello", new_arguments, new_environment_variables) == -1)
@@ -223,5 +231,3 @@ int main(int argc, char *argv[])
 
     return 0;
 }
-
-
